@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>canvas</title>
+	<script src="shape.js"></script>
+	<script>
+		window.onload=function  () {
+			var kuan=document.documentElement.clientWidth
+			var gao=document.documentElement.clientHeight
+			var canvas=document.querySelector("canvas")
+			canvas.width=0.92*kuan
+			canvas.height=gao
+			var cobj=canvas.getContext("2d")
+			var xp=document.querySelector(".xp")
+			var copy=document.querySelector(".copy")
+			var shape=new Shape(copy,cobj,xp)
+			
+
+
+			var type=document.querySelectorAll(".type li")
+			for (var i = 0; i < type.length; i++) {
+				type[i].onclick=function(){
+					shape.type=this.getAttribute("data-role")
+					if(shape.type!="clear"){
+						if(shape.type=="polygon"){
+							shape.bianNum = prompt("请输入角数", 5);
+						}
+						if(shape.type=="polygon_star"){
+							shape.jiaoNum = prompt("请输入角数", 5);
+						}
+						shape.draw()
+					}else if(shape.type=="clear"){
+						shape.clear()
+					}
+					
+				}
+			};
+
+			var style=document.querySelectorAll(".style li")
+			for (var i = 0; i < style.length; i++) {
+				style[i].onclick=function(){
+					shape.style=this.getAttribute("data-role")
+					shape.draw()
+				}
+			};
+
+			var color=document.querySelectorAll(".color input")
+				color[0].onchange=function(){
+					shape.strokeStyle=this.value
+					shape.draw()
+				}
+				color[1].onchange=function(){
+					shape.fillStyle=this.value
+					shape.draw()
+				}
+
+
+			/*返回*/
+			var newone=document.querySelector(".new")
+			var save=document.querySelector(".save")
+			var back=document.querySelector(".back")
+			var next=document.querySelector(".next")
+
+			back.onclick=function () {
+				if(shape.history.length==0){
+					cobj.clearRect(0,0,canvas.width,canvas.height);
+					setTimeout(function(){
+						alert("不能返回");
+					},10)
+				}
+
+				if(shape.isback){
+					if(shape.history.length==1){
+						shape.histroy.pop();
+						cobj.clearRect(0,0,canvas.width,canvas.height);
+					}else{
+						shape.history.pop();
+						cobj.putImageData(shape.history.pop(),0,0);
+
+					}
+				}else{
+					cobj.putImageData(shape.history.pop(),0,0);
+				}
+
+				shape.isback=false;
+			}
+
+
+
+			/*save*/
+			save.onclick=function () {
+				if(shape.history.length>0) {
+					location.href = canvas.toDataURL().replace("image/png", "stream/octet");
+				}
+			}
+
+//			/*new*/
+			newone.onclick=function () {
+				if(shape.history.length>0){
+					var yes=confirm("是否保存");
+					if(yes){
+						location.href=canvas.toDataURL().replace("image/png","stream/octet");
+					}
+					shape.history=[];
+					cobj.clearRect(0,0,canvas.width,canvas.height);
+
+				}
+			}
+
+			//线宽
+			var number=document.querySelector(".number")
+			var lineWidth=document.querySelectorAll(".lineWidth")
+			for(var i=0;i<lineWidth.length;i++){
+				lineWidth[i].onclick=function () {
+					shape.lineWidth=this.getAttribute("xiankuan");
+					shape.draw();
+				}
+			}
+			number.onchange=function () {
+				shape.lineWidth=this.value;
+				shape.draw();
+			}
+
+
+		}
+	</script>
+</head>
+<link rel="stylesheet" href="css/canvas.css">
+<body>
+	<div class="box">
+		<div class="choice">
+			<ol>
+				<li class="new">&#xe608;</li>
+				<li class="save">&#xe601;</li>
+				<li class="back">&#xe600;</li>
+				<!--<li class="next">&#xe60c;</li>-->
+			</ol>
+
+			<ul class="type">
+				<li data-role="line">&#xe606;</li>
+				<li data-role="rect">&#xe603;</li>
+				<li data-role="circle">&#xe605;</li>
+				<li data-role="pencil">&#xe604;</li>
+				<li data-role="triangle">&#xe607;</li>
+				<li data-role="star">&#xe60e;</li>
+				<li data-role="clear">&#xe609;</li>
+				<li data-role="polygon" style="font-size: 18px;line-height: 18px;">多边形</li>
+				<li data-role="polygon_star" style="font-size: 18px;line-height: 18px;">多角形</li>
+			</ul>
+			<ul class="style">
+				<li data-role="fill">&#xe60a;</li>
+				<li data-role="stroke">&#xe60b;</li>
+			</ul>
+			<ul class="color">
+				<li><input type="color" data-role="strokeStyle">边框</li>
+				<li><input type="color" data-role="fillStyle">填充</li>
+			</ul>
+			<ul class="linewidth-box">
+				<li class="lineWidth" xiankuan="1">
+					细
+				</li>
+				<li class="lineWidth" xiankuan="5">
+					中
+				</li>
+				<li class="lineWidth" xiankuan="10">
+					粗
+				</li>
+				<li class="input">
+					<input class="number" type="number" placeholder="请输入数字">
+				</li>
+
+			</ul>
+		</div>
+		<div class="borad">
+			<div class="copy"></div>
+			<canvas></canvas>
+			<div class="xp"></div>
+		</div>
+	</div>
+</body>
+</html>
